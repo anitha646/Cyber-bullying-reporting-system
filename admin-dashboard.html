@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Reporting Officer Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h2 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .reports-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h3 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .report-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .report-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .report-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .report-item.new {
+            border-left: 5px solid #e74c3c;
+            background: #fff5f5;
+        }
+
+        .report-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .report-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .report-id {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .report-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background: #ffe0e0;
+            color: #e74c3c;
+        }
+
+        .status-reviewing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .report-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .report-detail-item {
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .report-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #5568d3;
+        }
+
+        .respond-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .respond-btn:hover {
+            background: #218838;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h3 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .close-modal {
+            background: #f0f0f0;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .modal-section {
+            margin-bottom: 30px;
+        }
+
+        .modal-section h4 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 15px;
+        }
+
+        /* AI Chatbot for Admin */
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s;
+            z-index: 999;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-toggle span {
+            font-size: 30px;
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+        }
+
+        .chatbot-window.active {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            font-size: 18px;
+        }
+
+        .close-chat {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9ff;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .bot-message .message-bubble {
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+
+        .user-message {
+            flex-direction: row-reverse;
+        }
+
+        .user-message .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chatbot-window {
+                width: calc(100% - 40px);
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🛡️ SafeReport - Admin Portal</h1>
+        <div class="nav-actions">
+            <div class="notification-bell" onclick="showNotifications()">
+                🔔
+                <span class="notification-badge" id="notificationCount">0</span>
+            </div>
+            <div class="user-info">
+                <span id="adminName">Officer Name</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h2>Dashboard Overview</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="totalReports">0</div>
+                <div class="stat-label">Total Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔴</div>
+                <div class="stat-value" id="newReports">0</div>
+                <div class="stat-label">New Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-value" id="reviewingReports">0</div>
+                <div class="stat-label">Under Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="resolvedReports">0</div>
+                <div class="stat-label">Resolved</div>
+            </div>
+        </div>
+
+        <div class="reports-section">
+            <div class="section-header">
+                <h3>Incident Reports</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterReports('all')">All</button>
+                    <button class="filter-btn" onclick="filterReports('new')">New</button>
+                    <button class="filter-btn" onclick="filterReports('reviewing')">Reviewing</button>
+                    <button class="filter-btn" onclick="filterReports('resolved')">Resolved</button>
+                </div>
+            </div>
+
+            <div class="report-list" id="reportList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p>No reports available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Detail Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Report Details</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <div class="chatbot-toggle" onclick="toggleChatbot()">
+        <span>💬</span>
+    </div>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <h3>🤖 Admin Assistant</h3>
+            <button class="close-chat" onclick="toggleChatbot()">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot-message">
+                <div class="message-bubble">
+                    Hello! I'm your administrative assistant. I can help you with:
+                    <br><br>
+                    • Case handling procedures
+                    <br>• Legal guidelines for cyberbullying cases
+                    <br>• Resources for victim support
+                    <br>• Mental health professional contacts
+                    <br>• Documentation best practices
+                    <br><br>
+                    How can I assist you today?
+                </div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allReports = [];
+        let currentFilter = 'all';
+
+        // Load admin info and reports
+        window.onload = function() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user.fullName) {
+                document.getElementById('adminName').textContent = user.fullName;
+            }
+
+            loadReports();
+            updateStats();
+        };
+
+        function loadReports() {
+            // Load from localStorage
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            allReports = reports.map((report, index) => ({
+                ...report,
+                id: `RPT-${String(index + 1).padStart(5, '0')}`,
+                status: report.status || 'new'
+            }));
+
+            displayReports();
+        }
+
+        function displayReports() {
+            const reportList = document.getElementById('reportList');
+            
+            let filteredReports = allReports;
+            if (currentFilter !== 'all') {
+                filteredReports = allReports.filter(r => r.status === currentFilter);
+            }
+
+            if (filteredReports.length === 0) {
+                reportList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No ${currentFilter === 'all' ? '' : currentFilter} reports available</p>
+                    </div>
+                `;
+                return;
+            }
+
+            reportList.innerHTML = filteredReports.map(report => {
+                const statusClass = `status-${report.status}`;
+                const isNew = report.status === 'new';
+                const types = report.incidentDetails.types.join(', ');
+                
+                return `
+                    <div class="report-item ${isNew ? 'new' : ''}" onclick="viewReport('${report.id}')">
+                        <div class="report-header-row">
+                            <div>
+                                <div class="report-title">${report.victimInfo.name}</div>
+                                <div class="report-id">Report ID: ${report.id}</div>
+                            </div>
+                            <span class="report-status ${statusClass}">
+                                ${report.status.toUpperCase()}
+                            </span>
+                        </div>
+                        
+                        <div class="report-details">
+                            <div class="report-detail-item">
+                                <div class="detail-label">Incident Type</div>
+                                <div class="detail-value">${types}</div>
+                            </div>
+                            <div class="report-detail-item">
+                                <div class="detail-label">Date Reported</div>
+                                <div class="detail-value">${new Date(report.timestamp).toLocaleDateString()}</div>
+                            </div>
+                            <div class="report-detail-item">
+                                <div class="detail-label">Platform</div>
+                                <div class="detail-value">${report.incidentDetails.platform}</div>
+                            </div>
+                            <div class="report-detail-item">
+                                <div class="detail-label">Status</div>
+                                <div class="detail-value">${report.victimInfo.status}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="report-description">
+                            ${report.incidentDetails.description.substring(0, 200)}${report.incidentDetails.description.length > 200 ? '...' : ''}
+                        </div>
+                        
+                        <div class="report-actions">
+                            <button class="action-btn view-btn" onclick="event.stopPropagation(); viewReport('${report.id}')">
+                                View Details
+                            </button>
+                            <button class="action-btn respond-btn" onclick="event.stopPropagation(); respondToReport('${report.id}')">
+                                Take Action
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const total = allReports.length;
+            const newCount = allReports.filter(r => r.status === 'new').length;
+            const reviewing = allReports.filter(r => r.status === 'reviewing').length;
+            const resolved = allReports.filter(r => r.status === 'resolved').length;
+
+            document.getElementById('totalReports').textContent = total;
+            document.getElementById('newReports').textContent = newCount;
+            document.getElementById('reviewingReports').textContent = reviewing;
+            document.getElementById('resolvedReports').textContent = resolved;
+            document.getElementById('notificationCount').textContent = newCount;
+        }
+
+        function filterReports(filter) {
+            currentFilter = filter;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayReports();
+        }
+
+        function viewReport(reportId) {
+            const report = allReports.find(r => r.id === reportId);
+            if (!report) return;
+
+            const modalBody = document.getElementById('modalBody');
+            const types = report.incidentDetails.types.join(', ');
+            
+            modalBody.innerHTML = `
+                <div class="modal-section">
+                    <h4>Report Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Report ID</div>
+                            <div class="info-value">${report.id}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">${report.status.toUpperCase()}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Date Submitted</div>
+                            <div class="info-value">${new Date(report.timestamp).toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h4>Victim Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">${report.victimInfo.name}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">${report.victimInfo.status}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">${report.victimInfo.email}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Phone</div>
+                            <div class="info-value">${report.victimInfo.phone || 'Not provided'}</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Address</div>
+                        <div class="info-value">${report.victimInfo.address}</div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h4>Incident Details</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Date of Incident</div>
+                            <div class="info-value">${report.incidentDetails.date}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Platform</div>
+                            <div class="info-value">${report.incidentDetails.platform}</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Type of Cyberbullying</div>
+                        <div class="info-value">${types}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Description</div>
+                        <div class="info-value">${report.incidentDetails.description}</div>
+                    </div>
+                </div>
+
+                ${report.bullyInfo.name ? `
+                <div class="modal-section">
+                    <h4>Bully Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">${report.bullyInfo.name}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Relationship</div>
+                            <div class="info-value">${report.bullyInfo.relationship || 'Unknown'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">${report.bullyInfo.status || 'Unknown'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Contact</div>
+                            <div class="info-value">${report.bullyInfo.contact || 'Not provided'}</div>
+                        </div>
+                    </div>
+                    ${report.bullyInfo.additionalInfo ? `
+                    <div class="info-item">
+                        <div class="info-label">Additional Information</div>
+                        <div class="info-value">${report.bullyInfo.additionalInfo}</div>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+
+                <div class="modal-section">
+                    <h4>Evidence Files</h4>
+                    <div class="info-value">
+                        ${report.files.length > 0 ? report.files.join(', ') : 'No files uploaded'}
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <button class="action-btn respond-btn" onclick="respondToReport('${report.id}')" style="width: 100%; padding: 14px;">
+                        Take Action on This Report
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        function respondToReport(reportId) {
+            const report = allReports.find(r => r.id === reportId);
+            if (!report) return;
+
+            const action = prompt('Choose action:\n1. Mark as Reviewing\n2. Mark as Resolved\n3. Send to authorities\n\nEnter number (1-3):');
+            
+            if (action === '1') {
+                report.status = 'reviewing';
+                alert('Report marked as under review. Email notification will be sent to victim.');
+            } else if (action === '2') {
+                report.status = 'resolved';
+                alert('Report marked as resolved. Closure notification will be sent to victim.');
+            } else if (action === '3') {
+                alert('Report forwarded to appropriate authorities. Victim will be notified.');
+            }
+
+            // Update localStorage
+            const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+            const index = allReports.findIndex(r => r.id === reportId);
+            if (index !== -1) {
+                reports[index] = report;
+                localStorage.setItem('reports', JSON.stringify(reports));
+            }
+
+            loadReports();
+            updateStats();
+            closeModal();
+        }
+
+        function showNotifications() {
+            const newReports = allReports.filter(r => r.status === 'new');
+            if (newReports.length === 0) {
+                alert('No new notifications');
+                return;
+            }
+
+            const message = `You have ${newReports.length} new report(s):\n\n` +
+                newReports.map(r => `• ${r.victimInfo.name} - ${r.id}`).join('\n');
+            alert(message);
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'register.html';
+        }
+
+        // Chatbot functionality
+        function toggleChatbot() {
+            document.getElementById('chatbotWindow').classList.toggle('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = getAIResponse(message);
+                addMessage(response, 'bot');
+            }, 1000);
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            messageDiv.innerHTML = `<div class="message-bubble">${text}</div>`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('handle') || lowerMessage.includes('procedure') || lowerMessage.includes('process')) {
+                return "When handling cyberbullying cases: 1) Review the report within 24 hours. 2) Document all evidence thoroughly. 3) Assess severity and urgency. 4) Contact victim for additional information if needed. 5) Coordinate with appropriate authorities for severe cases. 6) Provide victim with support resources. 7) Follow up regularly until resolution. Would you like specific guidance on any step?";
+            }
+            
+            if (lowerMessage.includes('psychologist') || lowerMessage.includes('counselor') || lowerMessage.includes('mental health') || lowerMessage.includes('therapist')) {
+                return "Nearby mental health resources:\n\n1) National Crisis Hotline: 1-800-273-8255 (24/7)\n2) Crisis Text Line: Text HOME to 741741\n3) Local Counseling Services:\n   - Community Mental Health Center\n   - School Counseling Services\n   - Private Practice Referrals\n\nFor suicidal ideation cases, immediate psychiatric evaluation is recommended. Would you like contact information for emergency mental health services?";
+            }
+            
+            if (lowerMessage.includes('legal') || lowerMessage.includes('law') || lowerMessage.includes('authorities')) {
+                return "Legal procedures for cyberbullying cases: 1) Document all evidence with timestamps. 2) For minors, notify parents/guardians. 3) Severe cases (threats, explicit content) should be reported to local police. 4) Coordinate with school administration if applicable. 5) Inform victim of their legal rights. 6) Preserve digital evidence properly. Contact local law enforcement cybercrime unit for serious incidents.";
+            }
+            
+            if (lowerMessage.includes('documentation') || lowerMessage.includes('evidence') || lowerMessage.includes('record')) {
+                return "Best practices for documentation: 1) Take screenshots with visible timestamps. 2) Record URLs and platform details. 3) Save all communication in original format. 4) Maintain chain of custody for evidence. 5) Create detailed incident timeline. 6) Document all actions taken. 7) Store securely with restricted access. Proper documentation is crucial for potential legal proceedings.";
+            }
+            
+            if (lowerMessage.includes('support') || lowerMessage.includes('resources') || lowerMessage.includes('help victim')) {
+                return "Victim support resources to provide: 1) Crisis counseling services. 2) Legal aid organizations. 3) Online safety guides. 4) Peer support groups. 5) Educational materials about cyberbullying. 6) Privacy protection tools. 7) Follow-up check-ins. Always approach victims with empathy and assure confidentiality.";
+            }
+            
+            return "I can help you with case handling procedures, mental health resources, legal guidelines, documentation best practices, and victim support. What specific aspect would you like guidance on?";
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
